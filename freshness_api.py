@@ -80,37 +80,20 @@ def predict():
         }])
 
         # Predict hours until expiry
-            MAX_LIFE_HOURS = {
-        'BEEF': 96,
-        'CHEESE': 336,
-        'LETTUCE': 72,
-        'TOMATO': 120,
-        'ONION': 240,
-        'BURGER BUN': 168
-    }
+        predicted_hours = float(model.predict(features)[0])
 
-    time_in_refrigerator = float(data['time_in_refrigerator'])
-    ingredient_type = str(data['ingredient_type'])
-
-    max_hours = MAX_LIFE_HOURS.get(ingredient_type.upper(), 100)  # default 100 if missing
-    if time_in_refrigerator >= max_hours:
-        predicted_hours = 0
-        classification = "Expired"
-    else:
-        # Use ML prediction to classify freshness
+        # Map to Fresh/Stale/Expired
         if predicted_hours <= 0:
-            predicted_hours = 0
             classification = "Expired"
         elif predicted_hours <= 24:
             classification = "Stale"
         else:
             classification = "Fresh"
 
-    # Return the response
-    return jsonify({
-        "hours_until_expiry": predicted_hours,
-        "classification": classification
-    })
+        return jsonify({
+            "hours_until_expiry": predicted_hours,
+            "classification": classification
+        })
 
     except ValueError as e:
         return jsonify({"error": f"Invalid input: {e}"}), 400
@@ -143,5 +126,3 @@ def home():
 # ---------------------------
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-
-
